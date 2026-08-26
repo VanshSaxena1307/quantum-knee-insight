@@ -24,14 +24,16 @@ const trainInput = z.object({
   seed: z.number().int(),
 });
 
-interface ProxyResult<T> {
+type MlPayload = Record<string, unknown>;
+
+interface ProxyResult<T extends MlPayload = MlPayload> {
   available: boolean;
   latency_ms: number | null;
   data: T | null;
   error: string | null;
 }
 
-async function callMl<T>(path: string, init?: RequestInit): Promise<ProxyResult<T>> {
+async function callMl<T extends MlPayload = MlPayload>(path: string, init?: RequestInit): Promise<ProxyResult<T>> {
   const base = process.env["ML_SERVICE_URL"];
   if (!base) {
     return {

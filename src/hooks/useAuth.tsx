@@ -51,7 +51,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const role: AppRole = useMemo(() => {
     if (roles.length === 0) return "researcher";
-    return roles.reduce<AppRole>((best, r) => (ROLE_RANK[r] > ROLE_RANK[best] ? r : best), roles[0]);
+    return roles.reduce<AppRole>((best, r) => (ROLE_RANK[r] > ROLE_RANK[best] ? r : best), roles[0] as AppRole);
   }, [roles]);
 
   const value = useMemo<AuthState>(

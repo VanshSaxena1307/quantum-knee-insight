@@ -50,7 +50,7 @@ export async function logAudit(
       action,
       resource_type: resourceType ?? null,
       resource_id: resourceId ?? null,
-      metadata,
+      metadata: metadata as never,
     });
   } catch {
     // Audit logging must never block the user-facing action.
@@ -399,7 +399,7 @@ export async function listBenchmarks(experimentId?: string): Promise<Benchmark[]
 /* --------------------------- system settings ---------------------------- */
 
 export async function listSettings(): Promise<SystemSetting[]> {
-  return unwrap(await supabase.from("system_settings").select("*").order("key")) as SystemSetting[];
+  return unwrap(await supabase.from("system_settings").select("*").order("key")) as unknown as SystemSetting[];
 }
 
 export async function setSetting(key: string, value: unknown): Promise<void> {
@@ -415,8 +415,9 @@ export async function setSetting(key: string, value: unknown): Promise<void> {
 /* ------------------------------- exports -------------------------------- */
 
 export function toCsv(rows: Record<string, unknown>[]): string {
-  if (rows.length === 0) return "";
-  const headers = Object.keys(rows[0]);
+  const first = rows[0];
+  if (!first) return "";
+  const headers = Object.keys(first);
   const escape = (v: unknown) => {
     const s = v === null || v === undefined ? "" : typeof v === "object" ? JSON.stringify(v) : String(v);
     return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
