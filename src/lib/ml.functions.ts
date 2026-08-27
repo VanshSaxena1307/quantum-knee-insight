@@ -24,16 +24,17 @@ const trainInput = z.object({
   seed: z.number().int(),
 });
 
-type MlPayload = Record<string, unknown>;
+type Json = string | number | boolean | null | Json[] | { [key: string]: Json };
+type MlPayload = { [key: string]: Json };
 
-interface ProxyResult<T extends MlPayload = MlPayload> {
+interface ProxyResult {
   available: boolean;
   latency_ms: number | null;
-  data: T | null;
+  data: MlPayload | null;
   error: string | null;
 }
 
-async function callMl<T extends MlPayload = MlPayload>(path: string, init?: RequestInit): Promise<ProxyResult<T>> {
+async function callMl(path: string, init?: RequestInit): Promise<ProxyResult> {
   const base = process.env["ML_SERVICE_URL"];
   if (!base) {
     return {
@@ -68,7 +69,7 @@ async function callMl<T extends MlPayload = MlPayload>(path: string, init?: Requ
         error: `ML service returned ${res.status} ${res.statusText}`,
       };
     }
-    return { available: true, latency_ms: latency, data: (await res.json()) as T, error: null };
+    return { available: true, latency_ms: latency, data: (await res.json()) as MlPayload, error: null };
   } catch (err) {
     return {
       available: false,
