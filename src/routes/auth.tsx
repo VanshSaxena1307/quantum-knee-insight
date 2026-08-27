@@ -47,7 +47,10 @@ function AuthPage() {
     setBusy(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setBusy(false);
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     void router.navigate({ to: "/dashboard" });
   }
 
@@ -62,7 +65,10 @@ function AuthPage() {
       },
     });
     setBusy(false);
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success("Account created. If confirmation is required, check your inbox.");
     const { data } = await supabase.auth.getSession();
     if (data.session) void router.navigate({ to: "/dashboard" });
